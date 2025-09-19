@@ -31,7 +31,7 @@ Our component swap utility preserves component state by moving DOM elements to a
 
 This eliminates the hydration flash completely and preserves their DOM and JavaScript states without any other workaround, resulting in a seamless user and developer experience. No need to use external stores either. The component preserves the entire state on its own.
 
-### Ultra-Clean API
+### Clean API
 
 Just add `data-swap-id="unique-id"` to any component:
 
@@ -39,7 +39,13 @@ Just add `data-swap-id="unique-id"` to any component:
 <Counter client:load data-swap-id="my-counter" />
 ```
 
-That's it! No wrapper divs, no target slots, no complex setup.
+In an hypothetical Astro official implementation, this could be:
+
+```astro
+<!-- Hypothetical future Astro directive -->
+<MyComponent client:load transition:swap="unique-id" />
+```
+
 
 ## 🛠️ How It Works
 
@@ -107,12 +113,10 @@ allNewIslands.forEach(newIsland => {
 ## 🌟 Benefits
 
 - **No hydration flash** - Visual consistency maintained
-- **Preserves all state** - JavaScript variables, event listeners, reactive subscriptions
-- **Framework agnostic** - Works with React, Svelte, Vue, Solid, etc.
+- **Preserves all state** - JavaScript variables and DOM visual state. We need test upon events though, and possibly some other things I might not be aware of.
+- **Framework agnostic** - Should works in all frameworks. We need to test further. Svelte works. Don't know about the rest.
 - **Minimal setup** - Just add `data-swap-id` attribute
-- **Astro-native** - Leverages `transition:persist`
 - **Performance** - No extra overhead besides moving and removing DOM elements. Should be pretty cheap for the browser.
-- **Clean API** - Ultra-minimal developer experience
 
 ## 🔧 Project Structure
 
