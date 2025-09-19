@@ -1,0 +1,85 @@
+---
+import { ViewTransitions } from 'astro:transitions';
+
+interface Props {
+  title: string;
+}
+
+const { title } = Astro.props;
+---
+
+<!doctype html>
+<html lang="en" transition:animate="none">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="description" content="Astro Transition Swap Demo" />
+    <meta name="viewport" content="width=device-width" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="generator" content={Astro.generator} />
+    <title>{title}</title>
+
+    <!-- Component swap utility -->
+    <script src="../utils/astroClientSwap.ts"></script>
+
+    <!-- View Transitions -->
+    <ViewTransitions />
+  </head>
+  <body>
+    <nav>
+      <a href={import.meta.env.BASE_URL}>Home</a>
+      <a href={`${import.meta.env.BASE_URL}/example`}>Example</a>
+    </nav>
+
+    <main>
+      <slot />
+    </main>
+
+    <!-- Persistent container for component preservation -->
+    <div
+      id="client-swap-container"
+      transition:persist
+      style="display: none !important; position: absolute !important; top: -9999px !important; left: -9999px !important; visibility: hidden !important; pointer-events: none !important;"
+    ></div>
+  </body>
+</html>
+
+<style>
+  html {
+    font-family: system-ui, sans-serif;
+  }
+
+  body {
+    margin: 0;
+    padding: 20px;
+    line-height: 1.6;
+  }
+
+  nav {
+    background: #f5f5f5;
+    padding: 1rem;
+    margin-bottom: 2rem;
+    border-radius: 8px;
+  }
+
+  nav a {
+    color: #333;
+    text-decoration: none;
+    margin-right: 1rem;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    transition: background 0.2s;
+  }
+
+  nav a:hover {
+    background: #e0e0e0;
+  }
+
+  main {
+    max-width: 800px;
+  }
+
+  code {
+    font-family: Menlo, Monaco, Lucida Console, Liberation Mono, DejaVu Sans Mono,
+      Bitstream Vera Sans Mono, Courier New, monospace;
+  }
+</style>

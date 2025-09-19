@@ -1,5 +1,5 @@
 {
-  "name": "astro-component-swap-demo",
+  "name": "astro-transition-swap-demo",
   "type": "module",
   "version": "0.0.1",
   "scripts": {
@@ -9,6 +9,9 @@
     "astro": "astro"
   },
   "dependencies": {
-    "astro": "^5.13.9"
+    "@astrojs/svelte": "^7.1.1",
+    "astro": "^5.13.9",
+    "svelte": "^5.39.2",
+    "typescript": "^5.9.2"
   }
 }

@@ -1,16 +1,118 @@
 ---
-
+import Layout from "../layouts/Layout.astro"
+import Counter from "../components/Counter.svelte"
 ---
 
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
-	</head>
-	<body>
-		<h1>Astro</h1>
-	</body>
-</html>
+<Layout title="Home - Transition Swap Demo">
+	<h1>🏠 Home Page</h1>
+
+	<p>
+		Welcome to the Astro Component Swap demo! This demonstrates how to preserve
+		component state during view transitions.
+	</p>
+
+	<div class="demo-instructions">
+		<h3>Try This:</h3>
+		<ol>
+			<li>Increment the counter below</li>
+			<li>Navigate to the Example page</li>
+			<li>Come back to this page</li>
+			<li>Notice the counter preserved its value! ✨</li>
+		</ol>
+	</div>
+
+	<Counter client:load data-swap-id="demo-counter" />
+
+	<h2>The Problem</h2>
+	<p>
+		When navigating between pages in Astro with view transitions, framework components
+		are destroyed and recreated. Astro statically builds ands renders them server-side
+		with their initial values, then hydrates them client-side.
+	</p>
+	<p>
+		To preserve their state, we use Astro's "transition:persist" directive. But this
+		requires to have the component on every page the user might navigate to keep its
+		state (both Javascript and DOM wise) alive.
+	</p>
+	<p>
+		This is not solved by having their state saved external to the component, like using
+		Nanostores. Because there will be a brief flash between the initial, un-hydrated
+		state of the HTML document and the code processed by the hydratation process. Other
+		workarounds were to listen to ClientRouter events to hide the components until they
+		have been properly mounted with the data we need, resulting in bad UX and possibly
+		even more flashes of blank space across the page.
+	</p>
+	<h2>The Solution</h2>
+	<p>
+		Our component swap utility preserves component state by moving DOM elements to a
+		persistent hidden container with id="client-swap-container" located at the bottom of
+		the body during transitions. Then, if these components are found again (by checking
+		their "data-swap-id"), they will get swapped back before the page renders. This
+		eliminates the hydration flash completely and preserves their DOM and Javascript
+		states without any other workaround, resulting in a seamless user and developer
+		experience. No need to use external stores either. The component preserves the
+		entire state on its own.
+	</p>
+  <p>
+    Tested with Svelte 5. We need tests with other frameworks but I can't see why it wouldn't work.
+    We need to be sure nonetheless.
+  </p>
+	<h2>To Improve</h2>
+	<p>
+		This is a "hack" around Astro's ClientRouter events. In a potential official Astro
+		implementation, we should look for a syntax similar to "transition:" directives and
+		auto-generation of the wrapper in the body where the components get moved to.
+	</p>
+	<p>
+		There could be edge cases that I'm not aware of. One of them is what if the
+		component tagged with this directive gets used in a different page from the one it's
+		been actually saved? I would like to guess that, as long as they are declared with
+		the same id, similar to how "transition:" directives work, they will get swapped
+		across pages and preserved as well in pages where they are not present. This might
+		be even desired. Otherwise, if no "id" has been provided, it should target the
+		element from the original page and position. Maybe by generating unique random "ids"
+		at build time. I think "transition:" directives already do that.
+	</p>
+  <h2>Performance</h2>
+  <p>
+    I believe this is as performant as it can get. We're just moving DOM elements across the document,
+    and Javascript states gets preserved in the browser at all times. I can't think of any other way
+    that not only would be a chore for the developer, but also prone to more bugs and possibly worse
+    performance in the context of the browser. 
+  </p>
+</Layout>
+
+<style>
+	h1 {
+		color: #333;
+		margin-bottom: 1rem;
+	}
+
+	h2 {
+		color: #007acc;
+		margin-top: 2rem;
+		margin-bottom: 1rem;
+	}
+
+	h3 {
+		color: #333;
+		margin-bottom: 0.5rem;
+	}
+
+	.demo-instructions {
+		background: #f8f9fa;
+		border-left: 4px solid #007acc;
+		padding: 1.5rem;
+		margin: 2rem 0;
+		border-radius: 0 8px 8px 0;
+	}
+
+	.demo-instructions ol {
+		margin: 1rem 0 0 0;
+		padding-left: 1.5rem;
+	}
+
+	.demo-instructions li {
+		margin-bottom: 0.5rem;
+	}
+</style>
